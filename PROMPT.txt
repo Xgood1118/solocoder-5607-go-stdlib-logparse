@@ -1,0 +1,35 @@
+写一个日志分析工具，技术栈用 Go + 标准库。运维同事用它分析 Nginx/Apache/应用日志，统计访问量、错误率、慢请求啥的。
+
+支持日志格式：
+- Nginx/Apache combined 格式（IP - - [时间] "请求行" 状态 字节 "Referer" "User-Agent"）
+- Nginx error 格式
+- 自定义正则（用户传 -pattern 参数）
+- JSON Lines（一行一个 JSON）
+- 多文件（一个目录下所有 .log 文件一起分析）
+
+输入方式：传文件路径（-f access.log）、传目录（-d /var/log/nginx/ 递归读）、从 stdin 读（cat *.log | logparse）。多个 -f 合并分析。
+
+过滤：按时间范围（-from 2024-01-01 -to 2024-01-31）、按状态码（-status 4xx 5xx）、按请求路径（-path /api/*）、按 IP（-ip 192.168.1.*）、按方法（-method POST）、按 User-Agent 包含字符串。
+
+统计输出：
+- 总体：总请求数、错误数、错误率、平均响应时间、95/99 百分位、最大/最小
+- 状态码分布
+- Top N 请求路径（按访问次数 / 平均响应时间 / 错误率）
+- Top N 客户端 IP
+- 流量最大的时间段（按小时 / 按天）
+- Referer 来源分布
+- User-Agent 浏览器/爬虫分布
+
+输出格式：人类可读表格（默认 tab 分隔，-json 输出 JSON，-csv 输出 CSV）。多列对齐用 text/tabwriter。
+
+管道友好：默认输出简洁（路径:次数:平均时间），可以传 -verbose 显示详细。统计结果按值排序，可以传 -top 10 限制条数。
+
+性能：处理 GB 级日志不能爆内存。逐行读取 + 流式聚合（计数器数组 + 定期 flush 详情）。多文件并行读（goroutine）。进度条可选（处理超过 100MB 日志时显示）。
+
+异常处理：损坏的行不中断整个解析，跳过+记到 stderr 报告损坏行数。编码不对（GBK 之类）尝试自动识别。
+
+代码组织：main.go（CLI 解析）、internal/parser/（各种日志格式解析器）、internal/filter/（过滤条件）、internal/stats/（聚合统计）、internal/output/（输出格式）、internal/util/（IP 解析、时间解析、百分位计算）。
+
+依赖：spf13/cobra（CLI）、可选 rs/zerolog（日志）。Go stdlib 为主。
+
+启动：logparse -f access.log -from 2024-01-01 -status 5xx -top 20 -json > slow_apis.json。

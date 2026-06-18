@@ -1,0 +1,38 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+/test/5607-logparse
+/test/5607-logparse.exe
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Eval artifacts
+screenshot_*.png
+*_check.html
+*_debug.html
+edge_*.md
+empty.md
+img_test.md
+test_*.go
+test_*.py
+test_*.js
+/tmp_*.log
+/tmp_*.txt
