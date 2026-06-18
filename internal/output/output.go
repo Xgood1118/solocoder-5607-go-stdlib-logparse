@@ -37,16 +37,17 @@ type OutputResult struct {
 
 type SummaryResult struct {
 	TotalRequests  int64   `json:"total_requests"`
-	ErrorRequests  int64   `json:"error_requests"`
-	ErrorRate      float64 `json:"error_rate"`
-	TotalBytes     int64   `json:"total_bytes"`
-	AvgRespTime    float64 `json:"avg_resp_time"`
-	P95RespTime    float64 `json:"p95_resp_time"`
-	P99RespTime    float64 `json:"p99_resp_time"`
-	MaxRespTime    float64 `json:"max_resp_time"`
-	MinRespTime    float64 `json:"min_resp_time"`
-	FailedLines    int64   `json:"failed_lines"`
-	TotalLines     int64   `json:"total_lines"`
+	ErrorRequests int64   `json:"error_requests"`
+	ErrorRate     float64 `json:"error_rate"`
+	TotalBytes    int64   `json:"total_bytes"`
+	AvgRespTime   float64 `json:"avg_resp_time"`
+	P50RespTime   float64 `json:"p50_resp_time"`
+	P95RespTime   float64 `json:"p95_resp_time"`
+	P99RespTime   float64 `json:"p99_resp_time"`
+	MaxRespTime   float64 `json:"max_resp_time"`
+	MinRespTime   float64 `json:"min_resp_time"`
+	FailedLines   int64   `json:"failed_lines"`
+	TotalLines    int64   `json:"total_lines"`
 }
 
 type StatusItem struct {
@@ -148,12 +149,13 @@ func buildResult(agg *stats.Aggregator, opts OutputOptions) OutputResult {
 			ErrorRate:     agg.ErrorRate(),
 			TotalBytes:    agg.TotalBytes,
 			AvgRespTime:   agg.AvgRespTime(),
-			P95RespTime:   agg.P95(),
-			P99RespTime:   agg.P99(),
-			MaxRespTime:   agg.MaxResp,
-			MinRespTime:   agg.MinRespTime(),
-			FailedLines:   agg.FailedLines,
-			TotalLines:    agg.TotalLines,
+			P50RespTime:  agg.P50(),
+			P95RespTime:  agg.P95(),
+			P99RespTime:  agg.P99(),
+			MaxRespTime:  agg.MaxResp,
+			MinRespTime:  agg.MinRespTime(),
+			FailedLines:  agg.FailedLines,
+			TotalLines:   agg.TotalLines,
 		},
 		Status:  statusItems,
 		Paths:   pathItems,
@@ -181,6 +183,7 @@ func writeCSV(w io.Writer, agg *stats.Aggregator, opts OutputOptions) error {
 		_ = cw.Write([]string{"Summary", "Error Requests", strconv.FormatInt(agg.ErrorRequests, 10)})
 		_ = cw.Write([]string{"Summary", "Error Rate (%)", fmt.Sprintf("%.2f", agg.ErrorRate())})
 		_ = cw.Write([]string{"Summary", "Avg Resp Time", fmt.Sprintf("%.3f", agg.AvgRespTime())})
+		_ = cw.Write([]string{"Summary", "P50 Resp Time", fmt.Sprintf("%.3f", agg.P50())})
 		_ = cw.Write([]string{"Summary", "P95 Resp Time", fmt.Sprintf("%.3f", agg.P95())})
 		_ = cw.Write([]string{"Summary", "P99 Resp Time", fmt.Sprintf("%.3f", agg.P99())})
 		_ = cw.Write([]string{"Summary", "Max Resp Time", fmt.Sprintf("%.3f", agg.MaxResp)})
@@ -220,6 +223,7 @@ func writeTable(w io.Writer, agg *stats.Aggregator, opts OutputOptions) error {
 		fmt.Fprintf(tw, "Error Rate:\t%.2f%%\n", agg.ErrorRate())
 		fmt.Fprintf(tw, "Total Bytes:\t%d\n", agg.TotalBytes)
 		fmt.Fprintf(tw, "Avg Resp Time:\t%.3f\n", agg.AvgRespTime())
+		fmt.Fprintf(tw, "P50 Resp Time:\t%.3f\n", agg.P50())
 		fmt.Fprintf(tw, "P95 Resp Time:\t%.3f\n", agg.P95())
 		fmt.Fprintf(tw, "P99 Resp Time:\t%.3f\n", agg.P99())
 		fmt.Fprintf(tw, "Max Resp Time:\t%.3f\n", agg.MaxResp)

@@ -39,3 +39,17 @@ func TruncateToHour(t time.Time) time.Time {
 func TruncateToDay(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
+
+func ParseDateWithTimezone(s string, loc *time.Location) (time.Time, error) {
+	t, err := time.ParseInLocation("2006-01-02", s, loc)
+	if err == nil {
+		return t, nil
+	}
+
+	for _, format := range timeFormats {
+		if t, err := time.ParseInLocation(format, s, loc); err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, &time.ParseError{Layout: "multiple formats", Value: s}
+}

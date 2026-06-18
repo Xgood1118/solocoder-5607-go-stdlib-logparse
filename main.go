@@ -15,6 +15,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 )
 
 type stringSlice []string
@@ -110,7 +111,7 @@ func main() {
 	}
 
 	if fromStr != "" {
-		t, err := util.ParseDate(fromStr)
+		t, err := util.ParseDateWithTimezone(fromStr, time.Local)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "无效的 -from 时间: %v\n", err)
 			os.Exit(1)
@@ -118,7 +119,7 @@ func main() {
 		fil.From = t
 	}
 	if toStr != "" {
-		t, err := util.ParseDate(toStr)
+		t, err := util.ParseDateWithTimezone(toStr, time.Local)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "无效的 -to 时间: %v\n", err)
 			os.Exit(1)

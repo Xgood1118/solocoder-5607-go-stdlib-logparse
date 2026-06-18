@@ -167,6 +167,10 @@ func (a *Aggregator) P95() float64 {
 	return util.Percentile(a.RespTimes, 95)
 }
 
+func (a *Aggregator) P50() float64 {
+	return util.Percentile(a.RespTimes, 50)
+}
+
 func (a *Aggregator) P99() float64 {
 	return util.Percentile(a.RespTimes, 99)
 }

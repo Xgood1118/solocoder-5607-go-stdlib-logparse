@@ -23,7 +23,3 @@ func NewJSONParser() Parser {
 func NewRegexParser(pattern string) (Parser, error) {
 	return newRegexParser(pattern)
 }
-
-func NewAutoParser() Parser {
-	return &autoParser{}
-}
